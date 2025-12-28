@@ -1,290 +1,165 @@
-Welcome to your new TanStack app! 
+# TanStack Start Isomorphic Supabase Template
 
-# Getting Started
+A full-stack starter template combining [TanStack Start](https://tanstack.com/start) with [Supabase](https://supabase.com/) for building modern, type-safe web applications with seamless server/client data access patterns.
 
-To run this application:
+For a detailed walkthrough of the patterns used in this template, check out the companion blog post: [Isomorphic Supabase Pattern in TanStack Start](https://www.anchortags.dev/posts/isomorphic-supabase-pattern-in-tanstack-start).
+
+## Features
+
+- **Isomorphic Supabase Client** - Single API that works on both server and client using `createIsomorphicFn`
+- **Server Functions & Middleware** - Type-safe server functions with composable middleware for auth and Supabase access
+- **TanStack Query Integration** - Data fetching with React Query for caching, refetching, and optimistic updates
+- **Authentication Ready** - Sign in, sign up, and sign out flows with Supabase Auth
+- **Type-Safe Database** - Auto-generated TypeScript types from your Supabase schema
+- **File-Based Routing** - TanStack Router with automatic route generation
+- **Tailwind CSS v4** - Modern styling with the latest Tailwind
+- **Testing Setup** - Vitest configured and ready to use
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm
+- [Supabase CLI](https://supabase.com/docs/guides/cli)
+- Docker (for local Supabase)
+
+### Installation
 
 ```bash
 pnpm install
-pnpm start
 ```
 
-# Building For Production
+### Local Supabase Setup
 
-To build this application for production:
+Start the local Supabase instance:
 
 ```bash
-pnpm build
+pnpm supabase:start
 ```
 
-## Testing
+This will spin up a local Supabase instance with Postgres, Auth, and other services.
 
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
+### Environment Variables
+
+Create a `.env` file in the root of your project:
 
 ```bash
-pnpm test
+VITE_SUPABASE_URL=http://127.0.0.1:54321
+VITE_SUPABASE_ANON_KEY=<your-local-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<your-local-service-role-key>
 ```
 
-## Styling
+The keys are displayed when you run `pnpm supabase:start`.
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-
-
-
-## Routing
-This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add another a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you use the `<Outlet />` component.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-
-import { Link } from "@tanstack/react-router";
-
-export const Route = createRootRoute({
-  component: () => (
-    <>
-      <header>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-      </header>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-})
-```
-
-The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/people",
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people");
-    return response.json() as Promise<{
-      results: {
-        name: string;
-      }[];
-    }>;
-  },
-  component: () => {
-    const data = peopleRoute.useLoaderData();
-    return (
-      <ul>
-        {data.results.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    );
-  },
-});
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-### React-Query
-
-React-Query is an excellent addition or alternative to route loading and integrating it into you application is a breeze.
-
-First add your dependencies:
+### Development
 
 ```bash
-pnpm add @tanstack/react-query @tanstack/react-query-devtools
+pnpm dev
 ```
 
-Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
+The app will be available at [http://localhost:3000](http://localhost:3000).
+
+## Project Structure
+
+```text
+src/
+├── components/          # Shared React components
+├── lib/
+│   ├── auth/           # Authentication queries and utilities
+│   ├── middleware/     # Server function middleware (auth, supabase)
+│   ├── posts/          # Example feature module
+│   │   ├── components/ # Feature-specific components
+│   │   ├── mutations.ts
+│   │   ├── queries.ts
+│   │   └── service.ts
+│   └── supabase/       # Supabase client configuration
+│       ├── client.ts        # Isomorphic client
+│       ├── browser-client.ts
+│       ├── server-client.ts
+│       ├── admin-client.ts
+│       └── hooks/           # React hooks for auth actions
+├── routes/             # File-based routes
+└── router.tsx          # Router configuration
+```
+
+## Key Patterns
+
+### Isomorphic Supabase Client
+
+The template provides a unified Supabase client that automatically uses the correct implementation based on the environment:
 
 ```tsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createSupabaseClient } from "@/lib/supabase"
 
-// ...
-
-const queryClient = new QueryClient();
-
-// ...
-
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  );
-}
+// Works in both server functions and client components
+const supabase = createSupabaseClient()
+const { data } = await supabase.from("posts").select()
 ```
 
-You can also add TanStack Query Devtools to the root route (optional).
+### Server Function Middleware
+
+Compose middleware for authentication and database access:
 
 ```tsx
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { createServerFn } from "@tanstack/react-start"
+import { authMiddleware } from "@/lib/middleware/auth"
 
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
+const getProtectedData = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    // context.user is available and typed
+    // context.supabase is the server client
+    return context.supabase.from("posts").select()
+  })
 ```
 
-Now you can use `useQuery` to fetch your data.
+### Feature-Based Organization
 
-```tsx
-import { useQuery } from "@tanstack/react-query";
+Each feature (e.g., posts) contains:
 
-import "./App.css";
+- **service.ts** - Database operations as a class
+- **queries.ts** - Server functions for data fetching
+- **mutations.ts** - Server functions for data mutations
+- **components/** - Feature-specific React components
 
-function App() {
-  const { data } = useQuery({
-    queryKey: ["people"],
-    queryFn: () =>
-      fetch("https://swapi.dev/api/people")
-        .then((res) => res.json())
-        .then((data) => data.results as { name: string }[]),
-    initialData: [],
-  });
+## Scripts
 
-  return (
-    <div>
-      <ul>
-        {data.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+| Command                   | Description                             |
+| ------------------------- | --------------------------------------- |
+| `pnpm dev`                | Start development server on port 3000  |
+| `pnpm build`              | Build for production                    |
+| `pnpm preview`            | Preview production build                |
+| `pnpm test`               | Run tests with Vitest                   |
+| `pnpm supabase:start`     | Start local Supabase                    |
+| `pnpm supabase:stop`      | Stop local Supabase                     |
+| `pnpm supabase:db:reset`  | Reset database and run migrations       |
+| `pnpm supabase:db:diff`   | Generate migration from schema changes  |
+| `pnpm supabase:gen-types` | Regenerate TypeScript types from schema |
 
-export default App;
-```
+## Database Migrations
 
-You can find out everything you need to know on how to use React-Query in the [React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
+Migrations are located in `supabase/migrations/`. To create a new migration:
 
-## State Management
+1. Make changes to your database using [Supabase Studio](http://127.0.0.1:54323)
+2. Generate a migration: `pnpm supabase:db:diff -f <migration_name>`
+3. Regenerate types: `pnpm supabase:gen-types`
 
-Another common requirement for React applications is state management. There are many options for state management in React. TanStack Store provides a great starting point for your project.
+## Authentication
 
-First you need to add TanStack Store as a dependency:
+The template includes authentication hooks in `src/lib/supabase/hooks/`:
 
-```bash
-pnpm add @tanstack/store
-```
+- `useSignInWithPassword` - Email/password sign in
+- `useSignUpWithPassword` - Email/password sign up
+- `useSignOut` - Sign out
+- `useRefreshSession` - Refresh the current session
 
-Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
+Protected routes can use the `authMiddleware` to ensure users are authenticated.
 
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store } from "@tanstack/store";
-import "./App.css";
+## Learn More
 
-const countStore = new Store(0);
-
-function App() {
-  const count = useStore(countStore);
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-    </div>
-  );
-}
-
-export default App;
-```
-
-One of the many nice features of TanStack Store is the ability to derive state from other state. That derived state will update when the base state updates.
-
-Let's check this out by doubling the count using derived state.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store, Derived } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-const doubledStore = new Derived({
-  fn: () => countStore.state * 2,
-  deps: [countStore],
-});
-doubledStore.mount();
-
-function App() {
-  const count = useStore(countStore);
-  const doubledCount = useStore(doubledStore);
-
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-      <div>Doubled - {doubledCount}</div>
-    </div>
-  );
-}
-
-export default App;
-```
-
-We use the `Derived` class to create a new store that is derived from another store. The `Derived` class has a `mount` method that will start the derived store updating.
-
-Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
-
-You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+- [TanStack Start Documentation](https://tanstack.com/start/latest)
+- [TanStack Router Documentation](https://tanstack.com/router/latest)
+- [TanStack Query Documentation](https://tanstack.com/query/latest)
+- [Supabase Documentation](https://supabase.com/docs)
+- [Supabase Auth with SSR](https://supabase.com/docs/guides/auth/server-side)
